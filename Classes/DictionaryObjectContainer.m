@@ -36,7 +36,7 @@
     return objectArray;
 }
 
-- (id)arrayWithObjectArray:(NSArray *)objArray
+- (id)initWithObjectArray:(NSArray *)objArray
               objClassName:(NSString *)objClassName
                 objectName:(NSString *)objName
              needFormatKey:(BOOL)flag {
@@ -57,10 +57,10 @@
                                       @"object_name" : objName}];
 }
 
-- (id)arrayWithObjectArray:(NSArray *)objArray
+- (id)initWithObjectArray:(NSArray *)objArray
               objClassName:(NSString *)objClassName
                 objectName:(NSString *)objName {
-    return [self arrayWithObjectArray:objArray objClassName:objClassName objectName:objName needFormatKey:NO];
+    return [self initWithObjectArray:objArray objClassName:objClassName objectName:objName needFormatKey:NO];
 }
 
 

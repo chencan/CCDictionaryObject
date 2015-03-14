@@ -17,10 +17,10 @@
 @property (nonatomic, copy) NSString *objClassName;
 @property (nonatomic, copy) NSString *objectName;
 
-- (id)arrayWithObjectArray:(NSArray *)objArray
+- (id)initWithObjectArray:(NSArray *)objArray
               objClassName:(NSString *)className
                 objectName:(NSString *)objName;
-- (id)arrayWithObjectArray:(NSArray *)objArray
+- (id)initWithObjectArray:(NSArray *)objArray
               objClassName:(NSString *)objClassName
                 objectName:(NSString *)objName
              needFormatKey:(BOOL)flag;
