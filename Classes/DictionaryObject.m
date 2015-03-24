@@ -41,8 +41,8 @@
     }
     self = [self init];
     if (self) {
-//        self.dictionary = [[NSMutableDictionary alloc] initWithDictionary:[NSString formatDicKeyTounderLineName:theDictionary]];
-                self.dictionary = [[NSMutableDictionary alloc] initWithDictionary:theDictionary];
+        self.dictionary = [[NSMutableDictionary alloc] initWithDictionary:[NSString formatDicKeyTounderLineName:theDictionary]];
+//                self.dictionary = [[NSMutableDictionary alloc] initWithDictionary:theDictionary];
     }
     return self;
 }
