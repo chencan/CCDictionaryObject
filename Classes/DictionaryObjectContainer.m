@@ -52,9 +52,9 @@
     }
     
     
-    return [self initWithDictionary:@{objName: newArray,
+    return [self initWithDictionary:@{[objName lowercaseString]: newArray,
                                       @"obj_class_name" : objClassName,
-                                      @"object_name" : objName}];
+                                      @"object_name" : [objName lowercaseString]}];
 }
 
 - (id)initWithObjectArray:(NSArray *)objArray
