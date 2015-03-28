@@ -3,7 +3,7 @@
 //  tataUFO
 //
 //  Created by Can on 14-8-18.
-//  Copyright (c) 2014年 tataUFO.com. All rights reserved.
+//  Copyright (c) 2014年 http://chencan.github.io. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

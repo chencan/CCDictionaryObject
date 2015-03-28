@@ -3,7 +3,7 @@
 //  tataUFO
 //
 //  Created by Can on 9/9/14.
-//  Copyright (c) 2014 tataUFO.com. All rights reserved.
+//  Copyright (c) 2014 http://chencan.github.io. All rights reserved.
 //
 
 #import "NSString+PropertyName.h"
