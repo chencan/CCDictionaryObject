@@ -14,6 +14,6 @@
 
 - (NSString *)underLineName;
 
-+ (NSDictionary *)formatDicKeyTounderLineName:(NSDictionary *)dic;
++ (NSDictionary *)formatDicKeyToUnderLineName:(NSDictionary *)dic;
 
 @end

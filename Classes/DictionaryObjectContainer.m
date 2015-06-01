@@ -47,7 +47,7 @@
             NSDictionary *objDic = [(DictionaryObject *)obj dictionary];
             [newArray addObject:objDic];
         } else if ([obj isKindOfClass:[NSDictionary class]]) {
-            [newArray addObject:flag ? [NSString formatDicKeyTounderLineName:obj] : obj];
+            [newArray addObject:flag ? [NSString formatDicKeyToUnderLineName:obj] : obj];
         }
     }
     

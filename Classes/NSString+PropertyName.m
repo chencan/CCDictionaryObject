@@ -94,7 +94,7 @@
 
 
 
-+ (NSDictionary *)formatDicKeyTounderLineName:(NSDictionary *)dic {
++ (NSDictionary *)formatDicKeyToUnderLineName:(NSDictionary *)dic {
     NSArray *allKey = [dic allKeys];
     
     NSMutableDictionary *temp = [NSMutableDictionary dictionary];
