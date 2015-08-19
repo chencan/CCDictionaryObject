@@ -10,15 +10,18 @@
 
 @interface DictionaryObject : NSObject <NSCoding>
 
-
-@property (nonatomic, readonly, strong) NSString *string;
 @property (nonatomic, readonly, strong) NSMutableDictionary *dictionary;
-
-- (id)initWithString:(NSString *)theJsonStr;
-- (id)initWithDictionary:(NSDictionary *)theDictionary;
 
 + (id)objectWithString:(NSString *)theJsonStr;
 + (id)objectWithDictionary:(NSDictionary *)theDictionary;
+
+- (id)initWithDictionary:(NSDictionary *)theDictionary formatKey:(BOOL)format
+               checkType:(BOOL)check;
+- (id)initWithString:(NSString *)theJsonStr;
+- (id)initWithDictionary:(NSDictionary *)theDictionary;
+
+- (NSString *)string;
+- (NSString *)prettyPrintedString;
 
 
 @end

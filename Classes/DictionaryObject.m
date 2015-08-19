@@ -7,13 +7,11 @@
 //
 
 #import "DictionaryObject.h"
-#import "JSONKit.h"
 #import "NSString+PropertyName.h"
+#import <objc/runtime.h>
 
 @interface DictionaryObject ()
 
-
-@property (nonatomic, strong) NSString *string;
 @property (nonatomic, strong) NSMutableDictionary *dictionary;
 
 
@@ -21,128 +19,224 @@
 
 @implementation DictionaryObject
 
-@dynamic string;
-
 
 #pragma mark - Life cycle
 
-- (id)init {
+- (id)init
+{
     self = [super init];
     if (self) {
         self.dictionary = [NSMutableDictionary dictionary];
     }
-    return  self;
+
+    return self;
 }
 
+- (id)initWithDictionary:(NSDictionary *)theDictionary formatKey:(BOOL)format
+               checkType:(BOOL)checkType
+{
 
-- (id)initWithDictionary:(NSDictionary *)theDictionary {
     if (!theDictionary) {
         return nil;
     }
+
     self = [self init];
     if (self) {
-        self.dictionary = [[NSMutableDictionary alloc] initWithDictionary:[NSString formatDicKeyToUnderLineName:theDictionary]];
-//                self.dictionary = [[NSMutableDictionary alloc] initWithDictionary:theDictionary];
+        if (format) {
+            self.dictionary =
+              [[NSMutableDictionary alloc] initWithDictionary:[NSString formatDicKeyToUnderLineName:theDictionary]];
+        } else {
+            self.dictionary =
+              [[NSMutableDictionary alloc] initWithDictionary:theDictionary];
+        }
+        
+        if (checkType) {
+            unsigned int outCount = 0;
+            objc_property_t *props = class_copyPropertyList([self class],
+                &outCount);
+
+            for (int i = 0; i < outCount; i++) {
+                objc_property_t property = props[i];
+                NSString *propertyName = [NSString stringWithCString:property_getName(property)
+                                              encoding:NSUTF8StringEncoding];
+
+                NSString *propertyAttributes = [NSString stringWithCString:property_getAttributes(property)
+                                                    encoding:NSUTF8StringEncoding];
+
+                id propertyValue = [self.dictionary objectForKey:propertyName];
+
+                if (propertyValue &&
+                  [propertyValue isNotEqualTo:[NSNull null]]) {
+
+                    NSString *propertyAttributesType =
+                      [[propertyAttributes componentsSeparatedByString:@"\""] objectAtIndex:1];
+
+                    if (![[propertyValue class] isSubclassOfClass:NSClassFromString(propertyAttributesType)])
+                    {
+                        NSLog(@"Type of value for propertyName is not ok");
+                    }
+                }
+            }
+        }
     }
+
     return self;
 }
 
+- (id)initWithDictionary:(NSDictionary *)theDictionary
+{
+    return [self initWithDictionary:theDictionary formatKey:YES checkType:NO];
+}
 
-- (id)initWithString:(NSString *)theJsonStr {
+- (id)initWithString:(NSString *)theJsonStr
+{
     if (!theJsonStr || [theJsonStr length] <= 0) {
         return nil;
     }
-    
-    NSMutableDictionary *dic = [NSMutableDictionary dictionaryWithDictionary:[theJsonStr objectFromJSONStringWithParseOptions:JKParseOptionValidFlags]];
-    
-    self = [self initWithDictionary:dic];
-    
+
+    NSError *error = nil;
+    NSMutableDictionary *dic = nil;
+
+    dic =
+      [NSJSONSerialization JSONObjectWithData:[theJsonStr dataUsingEncoding:NSUTF8StringEncoding]
+           options:NSJSONReadingMutableContainers
+           error:&error];
+
+    if (!dic) {
+        NSLog(@"Input string cannot convert to json object");
+        if (error) {
+            NSLog(@"Error is: %@", error);
+        }
+    } else {
+        self = [self initWithDictionary:dic];
+    }
+
     return self;
 }
 
-- (NSMethodSignature *)methodSignatureForSelector:(SEL)selector {
++ (id)objectWithString:(NSString *)theJsonStr
+{
+    id newInstance = [[[self class] alloc] initWithString:theJsonStr];
+
+    return newInstance;
+}
+
+
++ (id)objectWithDictionary:(NSDictionary *)theDictionary
+{
+    id newInstance = [[[self class] alloc] initWithDictionary:theDictionary];
+
+    return newInstance;
+}
+
+
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)selector
+{
     NSString *selectorName = NSStringFromSelector(selector);
+
     if ([selectorName rangeOfString:@"set"].location == 0) {
         return [NSMethodSignature signatureWithObjCTypes:"v@:@"];
     }
-    
+
     return [NSMethodSignature signatureWithObjCTypes:"@@:"];
 }
 
 
-- (void)forwardInvocation:(NSInvocation *)invocation {
-    
+- (void)forwardInvocation:(NSInvocation *)invocation
+{
+
     NSString *selectorName = NSStringFromSelector([invocation selector]);
-    
+
     NSString *key = nil;
+
     if ([selectorName rangeOfString:@"set"].location == 0) {
-        key = [[selectorName substringWithRange:NSMakeRange(3, [selectorName length]-4)] underLineName];
-        
+        key =
+          [[selectorName substringWithRange:NSMakeRange(3, [selectorName length] -
+                4)] underLineName];
+
         id __unsafe_unretained obj;
         [invocation getArgument:&obj atIndex:2];
-        
+
         [self.dictionary setObject:obj ? obj : [NSNull null] forKey:key];
     } else {
-        
-        
+
+
         key = [selectorName underLineName];
-        
+
         id obj = [self.dictionary objectForKey:key];
         [invocation setReturnValue:&obj];
     }
 }
 
 
-- (NSString *)description {
+- (NSString *)description
+{
     return [self.dictionary description];
 }
-#pragma mark - Interface
+#pragma mark - Public
 
-+ (id)objectWithString:(NSString *)theJsonStr {
-    id newInstance = [[[self class] alloc] initWithString:theJsonStr];
-    return newInstance;
-}
+- (NSString *)stringPrettyPrinted:(BOOL)prettyPrinted
+{
 
+    NSString *result = nil;
 
-+ (id)objectWithDictionary:(NSDictionary *)theDictionary {
-    id newInstance = [[[self class] alloc] initWithDictionary:theDictionary];
-    return newInstance;
-}
-
-
-- (NSString *)string {
     if (self.dictionary) {
-        NSString *result = [self.dictionary JSONString];
-        return result;
+        NSError *error = nil;
+        NSData *tempData = nil;
+        tempData =
+          [NSJSONSerialization dataWithJSONObject:self.dictionary
+               options:prettyPrinted ? 0 : NSJSONWritingPrettyPrinted
+               error:&error];
+
+        if (!tempData) {
+            NSLog(@"Cannot convert to data");
+            if (error) {
+                NSLog(@"Error is: %@", error);
+            }
+        } else {
+            result =
+              [[NSString alloc] initWithData:tempData
+                   encoding:NSUTF8StringEncoding];
+
+            return result;
+        }
+
     }
-    return nil;
+
+    return result;
 }
 
 
-- (void)setString:(NSString *)theJsonStr {
-    NSMutableDictionary *dic = (NSMutableDictionary *)[theJsonStr objectFromJSONStringWithParseOptions:JKParseOptionValidFlags];
-    if (!dic) {
-        return ;
-    }
-    self.dictionary = dic;
+- (NSString *)string
+{
+    return [self stringPrettyPrinted:NO];
 }
 
+- (NSString *)prettyPrintedString
+{
+
+    return [self stringPrettyPrinted:YES];
+
+}
 
 
 #pragma mark - NSCoding
 
-- (id)initWithCoder:(NSCoder *)coder {
-    
+- (id)initWithCoder:(NSCoder *)coder
+{
+
     self = [super init];
-    if(self != nil) {
-        NSDictionary * dic = [coder decodeObjectForKey:@"dictionary"];
+    if (self != nil) {
+        NSDictionary *dic = [coder decodeObjectForKey:@"dictionary"];
         self.dictionary = [NSMutableDictionary dictionaryWithDictionary:dic];
     }
+
     return self;
 }
 
-- (void)encodeWithCoder:(NSCoder *)coder {
-    
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+
     if (self.dictionary) {
         [coder encodeObject:self.dictionary forKey:@"dictionary"];
     } else {
