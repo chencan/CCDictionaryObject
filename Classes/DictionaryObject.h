@@ -15,8 +15,7 @@
 + (id)objectWithString:(NSString *)theJsonStr;
 + (id)objectWithDictionary:(NSDictionary *)theDictionary;
 
-- (id)initWithDictionary:(NSDictionary *)theDictionary formatKey:(BOOL)format
-               checkType:(BOOL)check;
+- (id)initWithDictionary:(NSDictionary *)theDictionary formatKey:(BOOL)format;
 - (id)initWithString:(NSString *)theJsonStr;
 - (id)initWithDictionary:(NSDictionary *)theDictionary;
 

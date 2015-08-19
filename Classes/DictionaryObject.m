@@ -33,7 +33,6 @@
 }
 
 - (id)initWithDictionary:(NSDictionary *)theDictionary formatKey:(BOOL)format
-               checkType:(BOOL)checkType
 {
 
     if (!theDictionary) {
@@ -49,35 +48,36 @@
             self.dictionary =
               [[NSMutableDictionary alloc] initWithDictionary:theDictionary];
         }
-        
-        if (checkType) {
-            unsigned int outCount = 0;
-            objc_property_t *props = class_copyPropertyList([self class],
-                &outCount);
 
-            for (int i = 0; i < outCount; i++) {
-                objc_property_t property = props[i];
-                NSString *propertyName = [NSString stringWithCString:property_getName(property)
-                                              encoding:NSUTF8StringEncoding];
+#ifdef DEBUG
+        unsigned int outCount = 0;
+        objc_property_t *props = class_copyPropertyList([self class],
+            &outCount);
 
-                NSString *propertyAttributes = [NSString stringWithCString:property_getAttributes(property)
-                                                    encoding:NSUTF8StringEncoding];
+        for (int i = 0; i < outCount; i++) {
+            objc_property_t property = props[i];
+            NSString *propertyName = [NSString stringWithCString:property_getName(property)
+                                          encoding:NSUTF8StringEncoding];
 
-                id propertyValue = [self.dictionary objectForKey:propertyName];
+            NSString *propertyAttributes = [NSString stringWithCString:property_getAttributes(property)
+                                                encoding:NSUTF8StringEncoding];
 
-                if (propertyValue &&
-                  [propertyValue isNotEqualTo:[NSNull null]]) {
+            id propertyValue = [self.dictionary objectForKey:propertyName];
 
-                    NSString *propertyAttributesType =
-                      [[propertyAttributes componentsSeparatedByString:@"\""] objectAtIndex:1];
+            if (propertyValue &&
+              [propertyValue isNotEqualTo:[NSNull null]]) {
 
-                    if (![[propertyValue class] isSubclassOfClass:NSClassFromString(propertyAttributesType)])
-                    {
-                        NSLog(@"Type of value for propertyName is not ok");
-                    }
+                NSString *propertyAttributesType =
+                  [[propertyAttributes componentsSeparatedByString:@"\""] objectAtIndex:1];
+
+                if (![[propertyValue class] isSubclassOfClass:NSClassFromString(propertyAttributesType)])
+                {
+                    NSLog(@"Type of value for propertyName is not ok");
                 }
             }
         }
+#endif /* ifdef DEBUG */
+
     }
 
     return self;
@@ -85,7 +85,7 @@
 
 - (id)initWithDictionary:(NSDictionary *)theDictionary
 {
-    return [self initWithDictionary:theDictionary formatKey:YES checkType:NO];
+    return [self initWithDictionary:theDictionary formatKey:YES];
 }
 
 - (id)initWithString:(NSString *)theJsonStr
