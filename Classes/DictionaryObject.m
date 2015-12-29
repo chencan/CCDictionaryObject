@@ -65,7 +65,7 @@
             id propertyValue = [self.dictionary objectForKey:propertyName];
 
             if (propertyValue &&
-              [propertyValue isNotEqualTo:[NSNull null]]) {
+              ![propertyValue isEqualTo:[NSNull null]]) {
 
                 NSString *propertyAttributesType =
                   [[propertyAttributes componentsSeparatedByString:@"\""] objectAtIndex:1];
