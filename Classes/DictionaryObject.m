@@ -72,7 +72,7 @@
 
                 if (![[propertyValue class] isSubclassOfClass:NSClassFromString(propertyAttributesType)])
                 {
-                    NSLog(@"Type of value for propertyName is not ok");
+                    NSLog(@"Type of value for %@ is not ok", propertyName);
                 }
             }
         }
