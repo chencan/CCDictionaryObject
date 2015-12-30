@@ -50,32 +50,32 @@
         }
 
 #ifdef DEBUG
-        unsigned int outCount = 0;
-        objc_property_t *props = class_copyPropertyList([self class],
-            &outCount);
-
-        for (int i = 0; i < outCount; i++) {
-            objc_property_t property = props[i];
-            NSString *propertyName = [NSString stringWithCString:property_getName(property)
-                                          encoding:NSUTF8StringEncoding];
-
-            NSString *propertyAttributes = [NSString stringWithCString:property_getAttributes(property)
-                                                encoding:NSUTF8StringEncoding];
-
-            id propertyValue = [self.dictionary objectForKey:propertyName];
-
-            if (propertyValue &&
-              ![propertyValue isEqual:[NSNull null]]) {
-
-                NSString *propertyAttributesType =
-                  [[propertyAttributes componentsSeparatedByString:@"\""] objectAtIndex:1];
-
-                if (![[propertyValue class] isSubclassOfClass:NSClassFromString(propertyAttributesType)])
-                {
-                    NSLog(@"Type of value for %@ is not ok", propertyName);
-                }
-            }
-        }
+//        unsigned int outCount = 0;
+//        objc_property_t *props = class_copyPropertyList([self class],
+//            &outCount);
+//
+//        for (int i = 0; i < outCount; i++) {
+//            objc_property_t property = props[i];
+//            NSString *propertyName = [NSString stringWithCString:property_getName(property)
+//                                          encoding:NSUTF8StringEncoding];
+//
+//            NSString *propertyAttributes = [NSString stringWithCString:property_getAttributes(property)
+//                                                encoding:NSUTF8StringEncoding];
+//
+//            id propertyValue = [self.dictionary objectForKey:propertyName];
+//
+//            if (propertyValue &&
+//              ![propertyValue isEqual:[NSNull null]]) {
+//
+//                NSString *propertyAttributesType =
+//                  [[propertyAttributes componentsSeparatedByString:@"\""] objectAtIndex:1];
+//
+//                if (![[propertyValue class] isSubclassOfClass:NSClassFromString(propertyAttributesType)])
+//                {
+//                    NSLog(@"Type of value for %@ is not ok", propertyName);
+//                }
+//            }
+//        }
 #endif /* ifdef DEBUG */
 
     }
